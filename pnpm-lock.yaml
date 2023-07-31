@@ -5,12 +5,18 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  axios:
+    specifier: ^1.4.0
+    version: 1.4.0
   react:
     specifier: ^18.2.0
     version: 18.2.0
   react-dom:
     specifier: ^18.2.0
     version: 18.2.0(react@18.2.0)
+  react-router-dom:
+    specifier: ^6.14.2
+    version: 6.14.2(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
   "@commitlint/cli":
@@ -34,9 +40,9 @@ devDependencies:
   "@vitejs/plugin-react-swc":
     specifier: ^3.3.2
     version: 3.3.2(vite@4.4.5)
-  axios:
-    specifier: ^1.4.0
-    version: 1.4.0
+  autoprefixer:
+    specifier: ^10.4.14
+    version: 10.4.14(postcss@8.4.27)
   commitizen:
     specifier: ^4.3.0
     version: 4.3.0
@@ -61,15 +67,15 @@ devDependencies:
   lint-staged:
     specifier: ^13.2.3
     version: 13.2.3
+  postcss:
+    specifier: ^8.4.27
+    version: 8.4.27
   prettier:
     specifier: ^3.0.0
     version: 3.0.0
   prettier-plugin-tailwindcss:
     specifier: ^0.4.1
     version: 0.4.1(prettier@3.0.0)
-  react-router-dom:
-    specifier: ^6.14.2
-    version: 6.14.2(react-dom@18.2.0)(react@18.2.0)
   tailwindcss:
     specifier: ^3.3.3
     version: 3.3.3(ts-node@10.9.1)
@@ -958,6 +964,14 @@ packages:
     engines: { node: ">=6.0.0" }
     dev: true
 
+  /@jridgewell/resolve-uri@3.1.1:
+    resolution:
+      {
+        integrity: sha512-dSYZh7HhCDtCKm4QakX0xFpsRDqjjtZf/kjI/v3T3Nwt5r8/qz/M19F9ySyOqU94SXBmeG9ttTul+YnR4LOxFA==,
+      }
+    engines: { node: ">=6.0.0" }
+    dev: true
+
   /@jridgewell/set-array@1.1.2:
     resolution:
       {
@@ -996,7 +1010,7 @@ packages:
         integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==,
       }
     dependencies:
-      "@jridgewell/resolve-uri": 3.1.0
+      "@jridgewell/resolve-uri": 3.1.1
       "@jridgewell/sourcemap-codec": 1.4.15
     dev: true
 
@@ -1036,7 +1050,7 @@ packages:
         integrity: sha512-7Lcn7IqGMV+vizMPoEl5F0XDshcdDYtMI6uJLQdQz5CfZAwy3vvGKYSUk789qndt5dEC4HfSjviSYlSoHGL2+A==,
       }
     engines: { node: ">=14" }
-    dev: true
+    dev: false
 
   /@rollup/pluginutils@5.0.2:
     resolution:
@@ -1836,7 +1850,7 @@ packages:
       {
         integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==,
       }
-    dev: true
+    dev: false
 
   /at-least-node@1.0.0:
     resolution:
@@ -1844,6 +1858,25 @@ packages:
         integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==,
       }
     engines: { node: ">= 4.0.0" }
+    dev: true
+
+  /autoprefixer@10.4.14(postcss@8.4.27):
+    resolution:
+      {
+        integrity: sha512-FQzyfOsTlwVzjHxKEqRIAdJx9niO6VCBCoEwax/VLSoQF29ggECcPuBqUMZ+u8jCZOPSy8b8/8KnuFbp0SaFZQ==,
+      }
+    engines: { node: ^10 || ^12 || >=14 }
+    hasBin: true
+    peerDependencies:
+      postcss: ^8.1.0
+    dependencies:
+      browserslist: 4.21.10
+      caniuse-lite: 1.0.30001518
+      fraction.js: 4.2.0
+      normalize-range: 0.1.2
+      picocolors: 1.0.0
+      postcss: 8.4.27
+      postcss-value-parser: 4.2.0
     dev: true
 
   /axios@1.4.0:
@@ -1857,7 +1890,7 @@ packages:
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
-    dev: true
+    dev: false
 
   /balanced-match@1.0.2:
     resolution:
@@ -1920,7 +1953,7 @@ packages:
     engines: { node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7 }
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001517
+      caniuse-lite: 1.0.30001518
       electron-to-chromium: 1.4.477
       node-releases: 2.0.13
       update-browserslist-db: 1.0.11(browserslist@4.21.10)
@@ -1988,10 +2021,10 @@ packages:
     engines: { node: ">=10" }
     dev: true
 
-  /caniuse-lite@1.0.30001517:
+  /caniuse-lite@1.0.30001518:
     resolution:
       {
-        integrity: sha512-Vdhm5S11DaFVLlyiKu4hiUTkpZu+y1KA/rZZqVQfOD5YdDT/eQKlkt7NaE0WGOFgX32diqt9MiP9CAiFeRklaA==,
+        integrity: sha512-rup09/e3I0BKjncL+FesTayKtPrdwKhUufQFd3riFw1hHg8JmIFoInYfB102cFcY/pPgGmdyl/iy+jgiDi2vdA==,
       }
     dev: true
 
@@ -2175,7 +2208,7 @@ packages:
     engines: { node: ">= 0.8" }
     dependencies:
       delayed-stream: 1.0.0
-    dev: true
+    dev: false
 
   /commander@10.0.1:
     resolution:
@@ -2447,7 +2480,7 @@ packages:
         integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==,
       }
     engines: { node: ">=0.4.0" }
-    dev: true
+    dev: false
 
   /detect-file@1.0.0:
     resolution:
@@ -3009,7 +3042,7 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-    dev: true
+    dev: false
 
   /form-data@4.0.0:
     resolution:
@@ -3021,6 +3054,13 @@ packages:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
+    dev: false
+
+  /fraction.js@4.2.0:
+    resolution:
+      {
+        integrity: sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==,
+      }
     dev: true
 
   /fs-extra@11.1.1:
@@ -3907,6 +3947,7 @@ packages:
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
+    dev: false
 
   /lru-cache@5.1.1:
     resolution:
@@ -4009,7 +4050,7 @@ packages:
         integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==,
       }
     engines: { node: ">= 0.6" }
-    dev: true
+    dev: false
 
   /mime-types@2.1.35:
     resolution:
@@ -4019,7 +4060,7 @@ packages:
     engines: { node: ">= 0.6" }
     dependencies:
       mime-db: 1.52.0
-    dev: true
+    dev: false
 
   /mimic-fn@2.1.0:
     resolution:
@@ -4164,6 +4205,14 @@ packages:
     resolution:
       {
         integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==,
+      }
+    engines: { node: ">=0.10.0" }
+    dev: true
+
+  /normalize-range@0.1.2:
+    resolution:
+      {
+        integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==,
       }
     engines: { node: ">=0.10.0" }
     dev: true
@@ -4629,7 +4678,7 @@ packages:
       {
         integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==,
       }
-    dev: true
+    dev: false
 
   /punycode@2.3.0:
     resolution:
@@ -4673,6 +4722,7 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.0
+    dev: false
 
   /react-router-dom@6.14.2(react-dom@18.2.0)(react@18.2.0):
     resolution:
@@ -4688,7 +4738,7 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       react-router: 6.14.2(react@18.2.0)
-    dev: true
+    dev: false
 
   /react-router@6.14.2(react@18.2.0):
     resolution:
@@ -4701,7 +4751,7 @@ packages:
     dependencies:
       "@remix-run/router": 1.7.2
       react: 18.2.0
-    dev: true
+    dev: false
 
   /react@18.2.0:
     resolution:
@@ -4711,6 +4761,7 @@ packages:
     engines: { node: ">=0.10.0" }
     dependencies:
       loose-envify: 1.4.0
+    dev: false
 
   /read-cache@1.0.0:
     resolution:
@@ -4938,6 +4989,7 @@ packages:
       }
     dependencies:
       loose-envify: 1.4.0
+    dev: false
 
   /semver@5.7.2:
     resolution:
