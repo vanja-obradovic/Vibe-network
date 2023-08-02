@@ -9,7 +9,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "prepare": "husky install",
-    "commit": "cz"
+    "commit": "cz",
+    "test": "echo \"no test specified\" && exit 0"
   },
   "husky": {
     "hooks": {
