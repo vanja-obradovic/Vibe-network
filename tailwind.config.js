@@ -9,6 +9,7 @@ export default {
           muted:"#38414D"
         }
       }
+
     },
   },
   plugins: [],
