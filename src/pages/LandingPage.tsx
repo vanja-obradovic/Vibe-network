@@ -2,8 +2,14 @@ import Landing_BG from "../../public/images/landing_bg.png";
 import Logo from "../../public/images/logo.svg";
 import Metamask from "../../public/images/metamask.png";
 import WalletConnect from "../../public/images/walletconnect.png";
+import { useConnect } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
 
 const LandingPage = () => {
+  const { connect } = useConnect({
+    connector: new InjectedConnector(),
+  });
+
   return (
     <div className="grid max-h-screen grid-cols-2 bg-[#e0e1ed] bg-opacity-50">
       <div className="relative">
@@ -12,7 +18,7 @@ const LandingPage = () => {
       </div>
       <div className="flex flex-col justify-center gap-y-16 pl-9">
         <div className="space-y-4">
-          <h1 className="text-6xl font-bold text-text-muted ">Connect your wallet</h1>
+          <h1 className="text-6xl font-bold text-text-muted">Connect your wallet</h1>
           <div className="text-text-muted">
             Need help connecting a wallet?{" "}
             <a href="" className="underline">
@@ -25,7 +31,10 @@ const LandingPage = () => {
             <img src={Metamask} alt="metamask logo" className="pl-20" />
             <span>MetaMask</span>
           </button>
-          <button className="flex h-20 w-80 items-center  gap-x-9 rounded-2xl border-2 border-[rgba(255,255,255,0.24)] py-4 ">
+          <button
+            className="flex h-20 w-80 items-center  gap-x-9 rounded-2xl border-2 border-[rgba(255,255,255,0.24)] py-4 "
+            onClick={() => connect()}
+          >
             <img src={WalletConnect} alt="walletconnect logo" className="pl-20" />
             <span>WalletConnect</span>
           </button>

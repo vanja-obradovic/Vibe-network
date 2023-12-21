@@ -1,10 +1,11 @@
 import LandingPage from "../pages/LandingPage";
 import MainLayout from "./MainLayout";
+import { useAccount } from "wagmi";
 
 const ProtectedLayout = () => {
-  const connected = false;
+  const { isConnected } = useAccount();
 
-  if (!connected) return <LandingPage />;
+  if (!isConnected) return <LandingPage />;
 
   return <MainLayout />;
 };
