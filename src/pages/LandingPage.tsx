@@ -1,5 +1,5 @@
 import Landing_BG from "../../public/images/landing_bg.png";
-import Logo from "../../public/images/logo.svg";
+import { ReactComponent as Logo } from "../../public/images/logo.svg";
 import Metamask from "../../public/images/metamask.png";
 import WalletConnect from "../../public/images/walletconnect.png";
 import { useConnect } from "wagmi";
@@ -15,12 +15,10 @@ const LandingPage = () => {
   });
 
   return (
-    <div
-      className={`grid max-h-screen grid-cols-2 bg-[url('../../public/images/spheres.png')] bg-cover bg-center bg-no-repeat`}
-    >
+    <div className={`grid max-h-screen grid-cols-2 bg-[url('/images/spheres.png')] bg-cover bg-center bg-no-repeat`}>
       <div className="relative">
         <img src={Landing_BG} alt="landing background" className="h-screen w-full object-cover" />
-        <img src={Logo} alt="vibe logo" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
+        <Logo className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white" />
       </div>
       <div className="flex flex-col justify-center gap-y-16 pl-9">
         <div className="space-y-4">
