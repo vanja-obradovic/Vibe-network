@@ -1,3 +1,4 @@
+import { ContractProvider } from "../context/contract";
 import LandingPage from "../pages/LandingPage";
 import MainLayout from "./MainLayout";
 import { useAccount } from "wagmi";
@@ -7,7 +8,11 @@ const ProtectedLayout = () => {
 
   if (!isConnected) return <LandingPage />;
 
-  return <MainLayout />;
+  return (
+    <ContractProvider>
+      <MainLayout />
+    </ContractProvider>
+  );
 };
 
 export default ProtectedLayout;

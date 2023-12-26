@@ -6,22 +6,33 @@ import { numberFormatter } from "../../../app/utils/numbers";
 import ImageModal from "../Modals/ImageModal";
 import { useRef } from "react";
 import { ModalRef } from "../../molecule/Modal";
+import DonateModal from "../Modals/DonateModal";
+import { format } from "date-fns";
 
 type FeedCardProps = {
   name: string;
-  timestamp: Date;
+  timestamp: number;
   text: string;
-  media?: string;
   donations?: number;
   shares?: number;
+  postID: number;
 };
 
-const FeedCard = ({ name, text, donations, media, shares, timestamp }: FeedCardProps) => {
+const FeedCard = ({ name, text, donations, shares, timestamp, postID }: FeedCardProps) => {
   const imageModalRef = useRef<ModalRef>(null);
+  const donateModalRef = useRef<ModalRef>(null);
+
+  const urlRegex =
+    /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+
+  const media = urlRegex.exec(text);
+
+  const textWoURL = text.replace(urlRegex, "");
 
   return (
     <>
-      <ImageModal ref={imageModalRef} shares={10000} donations={2333} />
+      {media ? <ImageModal ref={imageModalRef} media={media[0]} shares={10000} donations={2333} /> : null}
+      <DonateModal ref={donateModalRef} postID={postID} />
       <div className="grid grid-cols-[auto_1fr] gap-x-4 rounded-2xl bg-white/25 px-4 py-5 text-text-muted backdrop-blur-md">
         <div>
           <UserPlaceholder className="h-16 w-16" />
@@ -31,29 +42,35 @@ const FeedCard = ({ name, text, donations, media, shares, timestamp }: FeedCardP
             <div className="space-x-2 self-center pt-2">
               <span className=" font-bold">{name}</span>
               <span>&middot;</span>
-              <span>{timestamp.toTimeString()}</span>
+              <span>{format(timestamp, "dd.MM.yy (HH:mm)")}</span>
             </div>
             <button className="h-fit p-1">
               <Options />
             </button>
           </div>
           <div className="flex flex-col gap-y-3">
-            <div>{text}</div>
-            <div>
-              <img
-                src={media}
-                alt="image placehoder"
-                className="aspect-video max-w-full object-cover hover:cursor-pointer"
-                onClick={() => imageModalRef.current?.open()}
-              />
-            </div>
+            <div>{textWoURL}</div>
+            {media ? (
+              <div>
+                <img
+                  src={media[0]}
+                  alt="image placehoder"
+                  className="aspect-video w-full max-w-full object-cover hover:cursor-pointer"
+                  onClick={() => imageModalRef.current?.open()}
+                />
+              </div>
+            ) : null}
             <div className="flex items-center gap-x-16">
               <span className="flex items-center gap-x-3 text-sm font-medium">
-                <img src={Coins} alt="coins image" />
+                <button onClick={() => donateModalRef.current?.open()}>
+                  <img src={Coins} alt="coins image" />
+                </button>
                 {numberFormatter(shares)}
               </span>
               <span className="font-meium flex items-center gap-x-3 text-sm font-medium">
-                <img src={Share} alt="share image" />
+                <button>
+                  <img src={Share} alt="share image" />
+                </button>
                 {numberFormatter(donations)}
               </span>
             </div>

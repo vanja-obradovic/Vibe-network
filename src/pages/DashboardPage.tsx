@@ -5,17 +5,53 @@ import PostModal from "../components/organism/Modals/PostModal";
 import { useRef } from "react";
 import { ModalRef } from "../components/molecule/Modal";
 import { ReactComponent as UserPlaceholder } from "../../public/images/userPlaceholder.svg";
+import { useContract } from "../context/contract";
+import { useForm } from "react-hook-form";
+import { useGetPostsRanged } from "../app/queries/posts/useGetPostsRanged";
+import { PostType } from "../app/types/post";
 import FeedCard from "../components/organism/FeedCard";
+import { useCreatePostMutation } from "../app/queries/posts/useCreatePostMutation";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useGetPostCount } from "../app/queries/posts/useGetPostCount";
+
+type FormDataType = {
+  text: string;
+};
 
 const DashboardPage = () => {
   const { address } = useAccount();
   const { data: ensName } = useEnsName({ address });
-
   const { disconnect } = useDisconnect();
+  const { contract } = useContract();
 
   const postModalRef = useRef<ModalRef>(null);
-
   const name = "3327";
+
+  const { data: postCount } = useGetPostCount({ contract });
+  const { data, hasNextPage, fetchNextPage } = useGetPostsRanged({
+    contract,
+    total: postCount!,
+    enabled: !!postCount,
+  });
+  const { mutateAsync: createPost } = useCreatePostMutation();
+
+  const { register, handleSubmit } = useForm<FormDataType>();
+
+  const submitHandler = (data: FormDataType) => {
+    createPost({ contract, text: data.text });
+  };
+
+  let posts: PostType[] = [];
+  if (data)
+    posts = data.pages?.flatMap((raw) => {
+      return raw.data.map((post) => {
+        return {
+          id: post[1],
+          msg: post[2],
+          timestamp: Number(post[0]) * 1000,
+        } satisfies PostType;
+      });
+    });
 
   return (
     <>
@@ -31,30 +67,49 @@ const DashboardPage = () => {
           <input type="text" placeholder="Search..." />
           <div className="flex flex-col gap-y-7">
             <h6>Update your Vibe</h6>
-            <div className="flex flex-col gap-y-2">
+            <form className="flex flex-col gap-y-2" onSubmit={handleSubmit(submitHandler)}>
               <div className="flex items-center gap-x-2 text-text-muted">
                 <UserPlaceholder />
-                <input type="text" className="flex-1" placeholder={`How's your vibe today ${name ?? ""}?`} />
+                <input
+                  {...register("text")}
+                  type="text"
+                  className="flex-1"
+                  placeholder={`How's your vibe today ${name ?? ""}?`}
+                />
               </div>
-              <Button type="button" className="self-end px-9 py-3">
+              <Button type="submit" className="self-end px-9 py-3">
                 POST
               </Button>
-            </div>
+            </form>
           </div>
           <div className="flex flex-col gap-y-7">
             <h6>Feed</h6>
-            <div className="flex flex-col gap-y-5">
-              <FeedCard
-                name="name"
-                text="blabla"
-                timestamp={new Date()}
-                shares={6400}
-                donations={3200}
-                media={
-                  "https://www.hindustantimes.com/ht-img/img/2023/11/03/900x1600/dogs_1698994013491_1698994013816.jpg"
-                }
-              ></FeedCard>
-            </div>
+            <InfiniteScroll
+              dataLength={posts.length}
+              next={fetchNextPage}
+              hasMore={hasNextPage}
+              loader={<h4 className="text-center">Loading...</h4>}
+              className="flex flex-col gap-y-5"
+              endMessage={
+                <p className="text-center">
+                  <b>No more, go rest from scrolling :&#41;</b>
+                </p>
+              }
+            >
+              {posts?.map((post, index) => {
+                return (
+                  <FeedCard
+                    postID={index}
+                    name={post.id}
+                    key={`${post.id} - ${index}`}
+                    text={post.msg}
+                    timestamp={post.timestamp}
+                    shares={6400}
+                    donations={3200}
+                  ></FeedCard>
+                );
+              })}
+            </InfiniteScroll>
           </div>
         </div>
         <div className="max-h-28 border-[16px] border-white/25 px-3 py-7 backdrop-blur-md">
