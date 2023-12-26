@@ -32,21 +32,17 @@ const ImageModal = forwardRef<ModalRef, ImageModalProps>(({ className, shares, d
           <BackArrow />
         </button>
         <div className={classNames(className, "mx-auto flex h-full w-1/2 flex-col items-center gap-y-7")}>
-          <img src={media} alt="image placeholder" className="h-[90%]" />
+          <img src={media} alt="image placeholder" className="h-[90%] object-contain" />
 
           <div className="flex flex-1 items-center gap-x-16">
-            <span className="flex items-center gap-x-3 text-sm font-medium text-white">
-              <button>
-                <img src={Coins} alt="coins image" className="brightness-0 invert" />
-              </button>
+            <button className="flex items-center gap-x-3 text-sm font-medium text-white">
+              <img src={Coins} alt="coins image" className="brightness-0 invert" />
               {numberFormatter(shares)}
-            </span>
-            <span className="flex items-center gap-x-3 text-sm font-medium text-white">
-              <button>
-                <img src={Share} alt="share image" className="brightness-0 invert" />
-              </button>
+            </button>
+            <button className="flex items-center gap-x-3 text-sm font-medium text-white">
+              <img src={Share} alt="share image" className="brightness-0 invert" />
               {numberFormatter(donations)}
-            </span>
+            </button>
           </div>
         </div>
       </>

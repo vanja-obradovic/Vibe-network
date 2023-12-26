@@ -44,11 +44,12 @@ const DashboardPage = () => {
   let posts: PostType[] = [];
   if (data)
     posts = data.pages?.flatMap((raw) => {
-      return raw.data.map((post) => {
+      return raw.data.map((post, index) => {
         return {
           id: post[1],
           msg: post[2],
           timestamp: Number(post[0]) * 1000,
+          postID: raw.idRangeStart - index,
         } satisfies PostType;
       });
     });
@@ -99,7 +100,7 @@ const DashboardPage = () => {
               {posts?.map((post, index) => {
                 return (
                   <FeedCard
-                    postID={index}
+                    postID={post.postID}
                     name={post.id}
                     key={`${post.id} - ${index}`}
                     text={post.msg}

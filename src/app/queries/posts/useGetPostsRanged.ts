@@ -4,6 +4,7 @@ import { Contract } from "ethers";
 
 export type Page = {
   data: RawPostType[];
+  idRangeStart: number;
   previousCursor?: number;
   nextCursor?: number;
 };
@@ -15,12 +16,12 @@ const fetch = async ({ contract, total, page }: { contract: Contract; total: num
   if (remainder !== 0 && page === pages) data = await contract?.fetchPostsRanged(0, remainder);
   else data = await contract?.fetchPostsRanged((pages - page) * 5 + remainder - 5, 5);
 
-  const Page = {
+  return {
     data: data.toReversed(),
+    idRangeStart: (pages - page) * 5 + remainder - 1,
     nextCursor: data.length === 5 ? page + 1 : undefined,
     previousCursor: page > 0 ? page - 1 : undefined,
   };
-  return Page;
 };
 
 export const useGetPostsRanged = ({
