@@ -8,6 +8,8 @@ import { useRef } from "react";
 import { ModalRef } from "../../molecule/Modal";
 import DonateModal from "../Modals/DonateModal";
 import { format } from "date-fns";
+import { useAccount } from "wagmi";
+import toast from "react-hot-toast";
 
 type FeedCardProps = {
   name: string;
@@ -22,6 +24,8 @@ const FeedCard = ({ name, text, donations, shares, timestamp, postID }: FeedCard
   const imageModalRef = useRef<ModalRef>(null);
   const donateModalRef = useRef<ModalRef>(null);
 
+  const { address } = useAccount();
+
   const urlRegex =
     /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
@@ -31,7 +35,16 @@ const FeedCard = ({ name, text, donations, shares, timestamp, postID }: FeedCard
 
   return (
     <>
-      {media ? <ImageModal ref={imageModalRef} media={media[0]} shares={10000} donations={2333} /> : null}
+      {media ? (
+        <ImageModal
+          ref={imageModalRef}
+          media={media[0]}
+          shares={10000}
+          donations={2333}
+          donate={donateModalRef.current}
+          canDonate={name !== address}
+        />
+      ) : null}
       <DonateModal ref={donateModalRef} postID={postID} />
       <div className="grid grid-cols-[auto_1fr] gap-x-4 rounded-2xl bg-white/25 px-4 py-5 text-text-muted backdrop-blur-md">
         <div>
@@ -61,18 +74,20 @@ const FeedCard = ({ name, text, donations, shares, timestamp, postID }: FeedCard
               </div>
             ) : null}
             <div className="flex items-center gap-x-16">
-              <span className="flex items-center gap-x-3 text-sm font-medium">
-                <button onClick={() => donateModalRef.current?.open()}>
-                  <img src={Coins} alt="coins image" />
-                </button>
+              <button
+                onClick={() => {
+                  if (name === address) toast.error("You can't sponsor yourself");
+                  else donateModalRef.current?.open();
+                }}
+                className="flex items-center gap-x-3 text-sm font-medium"
+              >
+                <img src={Coins} alt="coins image" />
                 {numberFormatter(shares)}
-              </span>
-              <span className="font-meium flex items-center gap-x-3 text-sm font-medium">
-                <button>
-                  <img src={Share} alt="share image" />
-                </button>
+              </button>
+              <button className="font-meium flex items-center gap-x-3 text-sm font-medium">
+                <img src={Share} alt="share image" />
                 {numberFormatter(donations)}
-              </span>
+              </button>
             </div>
           </div>
         </div>

@@ -6,6 +6,8 @@ import { ReactComponent as UserPlaceholder } from "../../../../../public/images/
 import { useForm } from "react-hook-form";
 import { useContract } from "../../../../context/contract";
 import { useCreatePostMutation } from "../../../../app/queries/posts/useCreatePostMutation";
+import toast from "react-hot-toast";
+import { ContractTransactionResponse } from "ethers";
 
 type PostModalProps = {
   className?: string;
@@ -35,7 +37,23 @@ const PostModal = forwardRef<ModalRef, PostModalProps>(({ className, name }, ref
   const { register, handleSubmit } = useForm<FormDataType>();
 
   const submitHandler = (data: FormDataType) => {
-    createPost({ contract, text: data.text });
+    createPost({ contract, text: data.text })
+      .then((tx) => {
+        toast.promise(
+          (tx as ContractTransactionResponse).wait(),
+          {
+            success: "Post successful",
+            loading: "Post pending",
+            error: "Post error",
+          },
+          { duration: 3000, loading: { duration: Infinity } }
+        );
+      })
+      .catch((err) => {
+        if (err.code === "ACTION_REJECTED") toast.error("User cancelled action");
+        else toast.error("Unknown error, please try again");
+      })
+      .finally(() => modalRef.current?.close());
   };
 
   return (

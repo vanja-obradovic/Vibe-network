@@ -1,6 +1,6 @@
 import { useInfiniteQuery, QueryKey, InfiniteData } from "@tanstack/react-query";
 import { RawPostType } from "../../types/post";
-import { Contract } from "ethers";
+import { Contract, ZeroAddress } from "ethers";
 
 export type Page = {
   data: RawPostType[];
@@ -17,7 +17,7 @@ const fetch = async ({ contract, total, page }: { contract: Contract; total: num
   else data = await contract?.fetchPostsRanged((pages - page) * 5 + remainder - 5, 5);
 
   return {
-    data: data.toReversed(),
+    data: data.toReversed().filter((post) => post[0] !== BigInt(0) && post[1] !== ZeroAddress && post[2] !== ""),
     idRangeStart: (pages - page) * 5 + remainder - 1,
     nextCursor: data.length === 5 ? page + 1 : undefined,
     previousCursor: page > 0 ? page - 1 : undefined,

@@ -1,8 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
-import { Contract } from "ethers";
+import { Contract, parseUnits } from "ethers";
 
-const fetch = async ({ contract, id }: { contract: Contract; id: number }): Promise<unknown> => {
-  return await contract?.sponsorPost(id);
+const fetch = async ({
+  contract,
+  id,
+  amount,
+}: {
+  contract: Contract;
+  id: number;
+  amount: string;
+}): Promise<unknown> => {
+  return await contract?.sponsorPost(id, { value: parseUnits(amount) });
 };
 
 export const useDonateMutation = () => {

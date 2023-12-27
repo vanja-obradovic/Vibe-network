@@ -1,4 +1,4 @@
-import { useAccount, useDisconnect, useEnsName } from "wagmi";
+import { useAccount, useBalance, useDisconnect, useEnsName } from "wagmi";
 import { ReactComponent as Logo } from "../../public/images/logo.svg";
 import Button from "../components/atom/Button";
 import PostModal from "../components/organism/Modals/PostModal";
@@ -13,6 +13,7 @@ import FeedCard from "../components/organism/FeedCard";
 import { useCreatePostMutation } from "../app/queries/posts/useCreatePostMutation";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useGetPostCount } from "../app/queries/posts/useGetPostCount";
+import { reduceAddress } from "../app/utils/helper";
 
 type FormDataType = {
   text: string;
@@ -20,6 +21,7 @@ type FormDataType = {
 
 const DashboardPage = () => {
   const { address } = useAccount();
+  const { data: balance } = useBalance({ address: address });
   const { data: ensName } = useEnsName({ address });
   const { disconnect } = useDisconnect();
   const { contract } = useContract();
@@ -53,6 +55,8 @@ const DashboardPage = () => {
         } satisfies PostType;
       });
     });
+
+  console.log(contract);
 
   return (
     <>
@@ -92,11 +96,23 @@ const DashboardPage = () => {
               loader={<h4 className="text-center">Loading...</h4>}
               className="flex flex-col gap-y-5"
               endMessage={
-                <p className="text-center">
-                  <b>No more, go rest from scrolling :&#41;</b>
-                </p>
+                posts.length > 0 ? (
+                  <p className="text-center">
+                    <b>No more, go rest from scrolling :&#41;</b>
+                  </p>
+                ) : null
               }
             >
+              <button
+                onClick={() =>
+                  contract.filters
+                    .PostSponsored()
+                    .getTopicFilter()
+                    .then((res: unknown) => console.log(res))
+                }
+              >
+                try
+              </button>
               {posts?.map((post, index) => {
                 return (
                   <FeedCard
@@ -114,9 +130,14 @@ const DashboardPage = () => {
           </div>
         </div>
         <div className="max-h-28 border-[16px] border-white/25 px-3 py-7 backdrop-blur-md">
-          <button className="h-full w-full text-ellipsis rounded-2xl bg-[#F7F8FF]" onClick={() => disconnect()}>
-            {ensName ?? address}
+          <button
+            className="h-full w-full text-ellipsis rounded-2xl bg-[#F7F8FF]"
+            onClick={() => disconnect()}
+            title={address}
+          >
+            {ensName ?? reduceAddress(address ?? "err")}
           </button>
+          <p className="text-center font-semibold">{`Balance: ${balance?.formatted} ${balance?.symbol}`}</p>
         </div>
       </div>
     </>
