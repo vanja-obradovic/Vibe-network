@@ -14,6 +14,10 @@ import { useCreatePostMutation } from "../app/queries/posts/useCreatePostMutatio
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useGetPostCount } from "../app/queries/posts/useGetPostCount";
 import { reduceAddress } from "../app/utils/helper";
+import { ContractTransactionResponse, EventLog } from "ethers";
+import toast from "react-hot-toast";
+import { useGetDonationsQuery } from "../app/queries/posts/useGetDonationsQuery";
+import { DonationType } from "../app/types/donation";
 
 type FormDataType = {
   text: string;
@@ -35,12 +39,28 @@ const DashboardPage = () => {
     total: postCount!,
     enabled: !!postCount,
   });
+  const { data: donationLog } = useGetDonationsQuery({ contract });
   const { mutateAsync: createPost } = useCreatePostMutation();
 
   const { register, handleSubmit } = useForm<FormDataType>();
 
   const submitHandler = (data: FormDataType) => {
-    createPost({ contract, text: data.text });
+    createPost({ contract, text: data.text })
+      .then((tx) => {
+        toast.promise(
+          (tx as ContractTransactionResponse).wait(),
+          {
+            success: "Post successful",
+            loading: "Post pending",
+            error: "Post error",
+          },
+          { duration: 3000, loading: { duration: Infinity } }
+        );
+      })
+      .catch((err) => {
+        if (err.code === "ACTION_REJECTED") toast.error("User cancelled action");
+        else toast.error("Unknown error, please try again");
+      });
   };
 
   let posts: PostType[] = [];
@@ -56,7 +76,13 @@ const DashboardPage = () => {
       });
     });
 
-  console.log(contract);
+  function isEventLog(args: unknown): args is EventLog {
+    return (args as EventLog).args !== undefined;
+  }
+
+  let donations: DonationType[] = [];
+  if (donationLog)
+    donations = donationLog.flatMap((log) => (isEventLog(log) ? [[log.args[0], log.args[1], log.args[2]]] : []));
 
   return (
     <>
@@ -103,16 +129,6 @@ const DashboardPage = () => {
                 ) : null
               }
             >
-              <button
-                onClick={() =>
-                  contract.filters
-                    .PostSponsored()
-                    .getTopicFilter()
-                    .then((res: unknown) => console.log(res))
-                }
-              >
-                try
-              </button>
               {posts?.map((post, index) => {
                 return (
                   <FeedCard
@@ -121,8 +137,7 @@ const DashboardPage = () => {
                     key={`${post.id} - ${index}`}
                     text={post.msg}
                     timestamp={post.timestamp}
-                    shares={6400}
-                    donations={3200}
+                    donations={donations.filter((donation) => Number(donation[0]) === post.postID)}
                   ></FeedCard>
                 );
               })}
