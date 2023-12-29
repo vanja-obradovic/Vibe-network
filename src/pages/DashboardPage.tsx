@@ -2,7 +2,7 @@ import { useAccount, useBalance, useDisconnect, useEnsName } from "wagmi";
 import { ReactComponent as Logo } from "../../public/images/logo.svg";
 import Button from "../components/atom/Button";
 import PostModal from "../components/organism/Modals/PostModal";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ModalRef } from "../components/molecule/Modal";
 import { ReactComponent as UserPlaceholder } from "../../public/images/userPlaceholder.svg";
 import { useContract } from "../context/contract";
@@ -19,8 +19,12 @@ import toast from "react-hot-toast";
 import { useGetDonationsQuery } from "../app/queries/posts/useGetDonationsQuery";
 import { DonationType } from "../app/types/donation";
 
-type FormDataType = {
+type FormPostType = {
   text: string;
+};
+
+type FormSearchType = {
+  term: string;
 };
 
 const DashboardPage = () => {
@@ -31,7 +35,7 @@ const DashboardPage = () => {
   const { contract } = useContract();
 
   const postModalRef = useRef<ModalRef>(null);
-  const name = "3327";
+  const name = ensName ?? reduceAddress(address ?? "err");
 
   const { data: postCount } = useGetPostCount({ contract });
   const { data, hasNextPage, fetchNextPage } = useGetPostsRanged({
@@ -42,9 +46,11 @@ const DashboardPage = () => {
   const { data: donationLog } = useGetDonationsQuery({ contract });
   const { mutateAsync: createPost } = useCreatePostMutation();
 
-  const { register, handleSubmit } = useForm<FormDataType>();
+  const { register, handleSubmit } = useForm<FormPostType>();
+  const { register: registerSearch, handleSubmit: handleSearch, setValue } = useForm<FormSearchType>();
+  const [searchFilter, setFilter] = useState<string>();
 
-  const submitHandler = (data: FormDataType) => {
+  const submitHandler = (data: FormPostType) => {
     createPost({ contract, text: data.text })
       .then((tx) => {
         toast.promise(
@@ -63,18 +69,43 @@ const DashboardPage = () => {
       });
   };
 
-  let posts: PostType[] = [];
-  if (data)
-    posts = data.pages?.flatMap((raw) => {
-      return raw.data.map((post, index) => {
-        return {
-          id: post[1],
-          msg: post[2],
-          timestamp: Number(post[0]) * 1000,
-          postID: raw.idRangeStart - index,
-        } satisfies PostType;
-      });
+  const searchHandler = (data: FormSearchType) => {
+    setFilter(data.term);
+  };
+
+  useEffect(() => {
+    contract?.on("PostCreated", () => {
+      toast.custom(
+        <div className="flex flex-col items-center gap-y-2 rounded-2xl bg-white/75 px-2 py-1">
+          New post/s available.
+          <Button type="button" onClick={() => window.location.reload()} className="px-4 py-1">
+            Refresh now
+          </Button>
+        </div>,
+        { duration: 30000, position: "top-center", id: "new_post" }
+      );
     });
+  }, []);
+
+  const [posts, setPosts] = useState<PostType[]>([]);
+  useEffect(() => {
+    if (data)
+      setPosts(
+        // Map shouldn't iterate through whole data array over and over. It would be better to track from which page to start
+        data.pages?.flatMap((raw) => {
+          return raw.data.flatMap((post, index) => {
+            if (searchFilter && post[1] !== searchFilter) return [];
+            else
+              return {
+                id: post[1],
+                msg: post[2],
+                timestamp: Number(post[0]) * 1000,
+                postID: raw.idRangeStart - index,
+              } satisfies PostType;
+          });
+        })
+      );
+  }, [data, searchFilter]);
 
   function isEventLog(args: unknown): args is EventLog {
     return (args as EventLog).args !== undefined;
@@ -95,10 +126,34 @@ const DashboardPage = () => {
           </Button>
         </div>
         <div className="flex flex-col gap-y-14 border-[16px] border-white/25 p-4 backdrop-blur-md">
-          <input type="text" placeholder="Search..." />
+          <div>
+            <form onSubmit={handleSearch(searchHandler)} className="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                {...registerSearch("term", { minLength: 1 })}
+                className="w-full rounded-2xl bg-white/25 px-1 py-2 text-text-muted backdrop-blur-md"
+              />
+              {searchFilter ? (
+                <button
+                  className="absolute right-2 top-1/2 h-5 w-5 -translate-y-1/2 rounded-full border-2 p-1 leading-[0]"
+                  onClick={() => {
+                    setFilter(undefined);
+                    setValue("term", "");
+                  }}
+                >
+                  x
+                </button>
+              ) : null}
+              {searchFilter ? `Showing posts for user ${searchFilter}` : null}
+            </form>
+          </div>
           <div className="flex flex-col gap-y-7">
             <h6>Update your Vibe</h6>
-            <form className="flex flex-col gap-y-2" onSubmit={handleSubmit(submitHandler)}>
+            <form
+              className="flex flex-col gap-y-2 rounded-2xl bg-white/25 p-4 text-text-muted backdrop-blur-md"
+              onSubmit={handleSubmit(submitHandler)}
+            >
               <div className="flex items-center gap-x-2 text-text-muted">
                 <UserPlaceholder />
                 <input
@@ -141,6 +196,11 @@ const DashboardPage = () => {
                   ></FeedCard>
                 );
               })}
+              {posts.length === 0
+                ? searchFilter
+                  ? "No posts matching search term"
+                  : "There are no posts, you can change that :)"
+                : null}
             </InfiniteScroll>
           </div>
         </div>

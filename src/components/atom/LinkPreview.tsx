@@ -18,17 +18,15 @@ const LinkPreview = ({ className, url, donatedAmount, donate, canDonate }: LinkP
   const isWebPage = linkPreview?.description !== "" && linkPreview?.title !== "" && linkPreview?.image !== "";
   const imageModalRef = useRef<ModalRef>(null);
 
-  console.log(linkPreview, url);
-
   return isLoading ? (
     <div>Loading....</div>
   ) : isWebPage ? (
     <a href={linkPreview?.url} target="__blank">
       <div className={classNames("flex items-center gap-x-4 rounded-2xl border border-text-muted/25 p-2", className)}>
-        <div>
+        <div className="flex-1">
           <img src={linkPreview?.image} alt="link preview image" className="rounded-2xl object-contain" />
         </div>
-        <div className="flex flex-col gap-y-2">
+        <div className="flex flex-[3] flex-col gap-y-2">
           <h2 className="text-lg font-semibold">{linkPreview?.title}</h2>
           <p>{linkPreview?.description}</p>
           <p>{linkPreview?.url}</p>
